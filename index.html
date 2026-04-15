@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI副業 適職診断</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --primary: #1A1A2E;
+    --accent: #4F46E5;
+    --accent-light: #EEF2FF;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+    --success: #059669;
+    --success-light: #ECFDF5;
+    --A: #4F46E5; --A-light: #EEF2FF;
+    --B: #0891B2; --B-light: #ECFEFF;
+    --C: #D97706; --C-light: #FFFBEB;
+    --D: #059669; --D-light: #ECFDF5;
+    --E: #DB2777; --E-light: #FDF2F8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--primary);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .hero {
+    background: var(--primary);
+    color: white;
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(79,70,229,0.18);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(219,39,119,0.12);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 4px 14px;
+    border-radius: 99px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 span { color: #A5B4FC; }
+  .hero-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    max-width: 480px;
+    margin: 0 auto 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    position: relative;
+    z-index: 1;
+  }
+  .hero-meta span::before { margin-right: 5px; }
+
+  /* PROGRESS */
+  .progress-wrap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .progress-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #818CF8);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  /* MAIN */
+  .main { max-width: 680px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* INTRO */
+  .intro-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+  }
+  .intro-card p { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+  .intro-card p:last-child { margin-bottom: 0; }
+  .how-to {
+    background: var(--accent-light);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .how-to-title { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .how-to ol { padding-left: 18px; }
+  .how-to li { font-size: 13px; color: #374151; margin-bottom: 6px; }
+
+  /* SECTION CARD */
+  .section-card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .section-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+  .section-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .section-title-wrap { flex: 1; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 2px; }
+  .section-title { font-size: 15px; font-weight: 700; }
+  .section-count {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'DM Serif Display', serif;
+    min-width: 32px;
+    text-align: right;
+  }
+  .section-count small { font-size: 12px; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; color: var(--muted); }
+
+  .items-list { padding: 8px 0; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .check-item:hover { background: #FAFAFA; }
+  .check-item.checked { background: #FAFAFA; }
+  .check-box {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .check-item.checked .check-box {
+    border-color: currentColor;
+    background: currentColor;
+  }
+  .check-mark {
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: white;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .check-item.checked .check-mark { opacity: 1; }
+  .check-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+    transition: color 0.15s;
+  }
+  .check-item.checked .check-text { color: var(--primary); font-weight: 500; }
+
+  /* Section colors */
+  .sec-A .section-icon { background: var(--A-light); }
+  .sec-A .section-label { color: var(--A); }
+  .sec-A .section-count { color: var(--A); }
+  .sec-A .check-item { color: var(--A); }
+
+  .sec-B .section-icon { background: var(--B-light); }
+  .sec-B .section-label { color: var(--B); }
+  .sec-B .section-count { color: var(--B); }
+  .sec-B .check-item { color: var(--B); }
+
+  .sec-C .section-icon { background: var(--C-light); }
+  .sec-C .section-label { color: var(--C); }
+  .sec-C .section-count { color: var(--C); }
+  .sec-C .check-item { color: var(--C); }
+
+  .sec-D .section-icon { background: var(--D-light); }
+  .sec-D .section-label { color: var(--D); }
+  .sec-D .section-count { color: var(--D); }
+  .sec-D .check-item { color: var(--D); }
+
+  .sec-E .section-icon { background: var(--E-light); }
+  .sec-E .section-label { color: var(--E); }
+  .sec-E .section-count { color: var(--E); }
+  .sec-E .check-item { color: var(--E); }
+
+  /* MINI CHART */
+  .score-bar-wrap { padding: 16px 24px; border-top: 1px solid var(--border); }
+  .score-bar-bg {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* RESULT */
+  .result-section { display: none; animation: fadeUp 0.5s ease; }
+  .result-section.visible { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .result-header {
+    text-align: center;
+    padding: 36px 24px 28px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .result-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .result-type-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .result-type-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .result-tagline {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .result-scores {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .result-scores-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 16px; letter-spacing: 0.06em; }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .score-row:last-child { margin-bottom: 0; }
+  .score-name { font-size: 13px; width: 130px; flex-shrink: 0; }
+  .score-track { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+  .score-num { font-size: 13px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+
+  .result-detail {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .result-detail-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-detail-header h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .result-detail-header p { font-size: 13px; color: var(--muted); }
+  .result-detail-body { padding: 20px 24px; }
+  .detail-block { margin-bottom: 20px; }
+  .detail-block:last-child { margin-bottom: 0; }
+  .detail-block-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .detail-block p { font-size: 14px; line-height: 1.7; color: #374151; }
+  .jobs-list { list-style: none; }
+  .jobs-list li {
+    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    color: #374151;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .jobs-list li:last-child { border-bottom: none; }
+  .jobs-list li::before { content: '▸'; flex-shrink: 0; margin-top: 1px; }
+
+  .first-step {
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 4px;
+  }
+  .first-step-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+  .first-step p { font-size: 14px; line-height: 1.7; }
+
+  .reset-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .reset-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">公式LINE限定 無料特典</div>
+  <h1>AI副業<br><span>適職診断</span></h1>
+  <p class="hero-sub">あなたの強みと生活スタイルに合った「最短で結果が出る副業」がわかります</p>
+  <div class="hero-meta">
+    <span>📋 全35問</span>
+    <span>⏱ 約5分</span>
+    <span>✨ 5タイプ判定</span>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 / 35</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="intro-card">
+    <p>副業で失敗する人の多くは、<strong>自分に合っていない副業を選んでいる</strong>ことが原因です。この診断では、当てはまる項目にチェックを入れるだけで、あなたに最も合ったAI副業のタイプが自動で判定されます。</p>
+    <div class="how-to">
+      <div class="how-to-title">📋 使い方</div>
+      <ol>
+        <li>各セクションの項目を読み、当てはまるものにチェックを入れる</li>
+        <li>直感でOK！正解・不正解はありません</li>
+        <li>全項目をチェックし終わると、結果が自動で表示されます</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- SECTIONS -->
+  <div id="sections"></div>
+
+  <!-- RESULT -->
+  <div class="result-section" id="resultSection">
+    <div class="result-header" id="resultHeader"></div>
+    <div class="result-scores" id="resultScores"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <button class="reset-btn" onclick="resetAll()">🔄 もう一度診断する</button>
+    <div class="footer-note">© この特典コンテンツは公式LINE登録者限定です。無断転載・再配布はご遠慮ください。</div>
+  </div>
+
+</div>
+
+<script>
+const DATA = {
+  A: {
+    emoji: '✍️',
+    label: 'セクション A',
+    title: '文章・言葉の傾向',
+    color: '#4F46E5',
+    light: '#EEF2FF',
+    items: [
+      '日記・メモ・SNS投稿など、文章を書く習慣がある',
+      '自分の考えや気持ちを言葉にするのが得意だと思う',
+      '情報を整理して文章にまとめるのが得意だと思う',
+      '文章で伝えることの方が、話すより得意だと思う',
+      'ブログやnoteを書いてみたい（または書いたことがある）',
+      '情報を調べてまとめる作業が苦にならない',
+      '書いた文章を読み返して、より良い表現に直すのが好き',
+    ],
+    typeName: 'AIライタータイプ',
+    tagline: '言葉で価値を届けるのが、あなたの最大の武器',
+    strength: '「伝える力」は、AIがどれだけ進化しても代替されにくいスキルです。AIへの指示（プロンプト）にあなたの言葉のセンスが加わることで、質の高いコンテンツを速く・安定して生み出せるようになります。',
+    jobs: ['AIを使ったブログ・note記事の執筆代行（クラウドワークス・ランサーズなど）', 'AIプロンプトを活用したSEO記事・商品説明文の量産', '自分のnote・ブログでのコンテンツ販売'],
+    step: '自分が「最近学んだこと」を1つ選んで、ChatGPTを使いながら800字の記事を書いてみてください。それがそのままポートフォリオの第一歩になります。',
+  },
+  B: {
+    emoji: '📸',
+    label: 'セクション B',
+    title: '発信・SNSの傾向',
+    color: '#0891B2',
+    light: '#ECFEFF',
+    items: [
+      'InstagramやX（Twitter）などのSNSに、週1回以上自分で投稿している',
+      'フォローしているアカウントの投稿を見て「自分もこういうの作れそう」と思ったことがある',
+      '何を投稿すれば反応が取れるか、考えるのが好き',
+      'トレンドや流行に敏感な方だと思う',
+      '人に「いいね」や反応をもらうと嬉しい・モチベーションが上がる',
+      '継続して発信することに抵抗がない',
+      'クライアントのSNSアカウントを運用・成長させることに興味がある',
+    ],
+    typeName: 'AI×SNS運用タイプ',
+    tagline: '発信を続けられるあなたが、SNS運用で一番強い',
+    strength: 'SNS運用は「継続できるか」が最大の勝負どころです。あなたの発信習慣とトレンド感覚に、AIの文章生成・画像生成を掛け合わせることで、投稿のスピードと質を一気に引き上げられます。',
+    jobs: ['中小企業・個人事業主のInstagramアカウント運用代行', 'AIを活用したショート動画の台本・キャプション制作', '自分のアカウントを育てて案件受注・アフィリエイトへ'],
+    step: 'まず自分のInstagramで「AIを使ってみた」系の投稿を1本作ってみましょう。その投稿を作るプロセス自体が、運用代行の実績づくりになります。',
+  },
+  C: {
+    emoji: '🎨',
+    label: 'セクション C',
+    title: 'デザイン・ビジュアルの傾向',
+    color: '#D97706',
+    light: '#FFFBEB',
+    items: [
+      'デザインやビジュアル表現に興味がある',
+      'Canvaや図解ツールを使ったことがある（または使ってみたい）',
+      '他の人の投稿やデザインを見て、好き・嫌いがはっきりわかる',
+      '色やフォント・レイアウトの違いが気になる方だ',
+      '人の役に立つ「素材」や「テンプレート」を作ることに興味がある',
+      '言葉より、ビジュアルの方が自分の気持ちや意図を伝えやすいと感じる',
+      '同じ情報でも、見た目が整っているかどうかで印象が全然違うと思う',
+    ],
+    typeName: 'AIデザインタイプ',
+    tagline: 'センスとAIを掛け合わせれば、作品が一気に商品になる',
+    strength: 'デザインの専門知識がなくても、AIツールがあれば本格的な作品が作れる時代です。あなたの「好きなもの・美しいと感じるもの」への感覚が、他の人との差別化につながります。',
+    jobs: ['Canva AIを使ったSNS投稿テンプレートの販売（BASEなど）', 'AI画像生成を活用したアイコン・バナー・素材の制作代行', '企業・個人向けのプロフィール画像・ヘッダー制作'],
+    step: 'Canvaの無料アカウントを作り、AI機能を使って「自己紹介カード」を1枚デザインしてみてください。SNSに投稿するだけで最初の実績になります。',
+  },
+  D: {
+    emoji: '📊',
+    label: 'セクション D',
+    title: 'マーケティング・分析の傾向',
+    color: '#059669',
+    light: '#ECFDF5',
+    items: [
+      '「なぜこの商品は売れているんだろう？」と考えたことがある',
+      '数字やデータを見て、傾向や原因を考えるのが好き',
+      '広告・集客・売上など、ビジネスの仕組みに興味がある',
+      '競合や市場を調べて比較・分析することが好き',
+      '「この施策、効果あるのかな？」と検証したくなる性格だ',
+      '企画を考えたり、戦略を立てることにワクワクする',
+      '売上やフォロワー数など、数字で成果を確認することが好き',
+    ],
+    typeName: 'AIマーケタータイプ',
+    tagline: 'ビジネスの仕組みを読み解けるあなたが、AI時代に最も重宝される',
+    strength: 'マーケティングの視点を持った人材は、AIツールを使いこなすことで「戦略立案→実行→改善」をひとりで回せるようになります。フリーランスとしての単価も上げやすく、将来性が非常に高いタイプです。',
+    jobs: ['AIを活用したコンテンツマーケティング支援（ブログ・SNS・メルマガ）', '競合リサーチ・市場分析レポートの作成代行', 'AIツールを活用した広告文・LP文章の制作'],
+    step: '好きなブランドや商品を1つ選んで、「なぜこれが売れているか」をAIと一緒に分析してみてください。その分析文章をnoteに投稿するだけで、ポートフォリオになります。',
+  },
+  E: {
+    emoji: '🤝',
+    label: 'セクション E',
+    title: 'サポート・教えることへの傾向',
+    color: '#DB2777',
+    light: '#FDF2F8',
+    items: [
+      '人の悩みや相談に乗るのが好き・得意だと思う',
+      '新しいことを覚えたら、誰かに教えたくなる',
+      '職場や身近な人に「AIってどう使うの？」と聞かれることがある',
+      '副業の相手として、企業や個人事業主をサポートしたいと思う',
+      '「誰かの役に立てた」と感じる瞬間が一番のモチベーションになる',
+      '初対面の人とも比較的すぐに打ち解けられる方だ',
+      '新しいツールや技術をいち早く試して、人に紹介したくなる',
+    ],
+    typeName: 'AI導入支援タイプ',
+    tagline: '人の悩みを解決できる人こそ、AI時代に最も稼げる',
+    strength: 'どんなにAIが進化しても、「人に寄り添い、わかりやすく伝える力」は代替できません。AIをまだ使いこなせていない中小企業・個人事業主はたくさんいます。あなたの対話力×AIの知識が、高単価の仕事に直結します。',
+    jobs: ['中小企業・個人事業主向けのAI活用コンサルティング', 'ストアカ・Zoomでの「ChatGPT入門」講座の開催', '業務効率化ツール（Notion AI・ChatGPTなど）の導入サポート'],
+    step: 'まず身近な人（家族・友人・職場の同僚）に「AIの使い方」を1つ教えてみてください。「教えられた！」という実感が、コンサル・講師としての自信の第一歩になります。',
+  },
+};
+
+const scores = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+const checks = {};
+let totalChecked = 0;
+const TOTAL = 35;
+
+function buildSections() {
+  const container = document.getElementById('sections');
+  Object.entries(DATA).forEach(([key, sec]) => {
+    const card = document.createElement('div');
+    card.className = `section-card sec-${key}`;
+    card.id = `sec-${key}`;
+
+    const items = sec.items.map((text, i) => {
+      const id = `${key}-${i}`;
+      checks[id] = false;
+      return `
+        <div class="check-item" id="item-${id}" onclick="toggle('${id}','${key}')">
+          <div class="check-box" style="color:${sec.color}">
+            <span class="check-mark">✓</span>
+          </div>
+          <span class="check-text">${text}</span>
+        </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon">${sec.emoji}</div>
+        <div class="section-title-wrap">
+          <div class="section-label">${sec.label}</div>
+          <div class="section-title">${sec.title}</div>
+        </div>
+        <div class="section-count" id="count-${key}" style="color:${sec.color}">
+          0<small>/7</small>
+        </div>
+      </div>
+      <div class="items-list">${items}</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" id="bar-${key}" style="background:${sec.color};width:0%"></div>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function toggle(id, key) {
+  checks[id] = !checks[id];
+  const item = document.getElementById(`item-${id}`);
+  item.classList.toggle('checked', checks[id]);
+
+  scores[key] = Object.entries(checks)
+    .filter(([k]) => k.startsWith(key))
+    .filter(([, v]) => v).length;
+
+  document.getElementById(`count-${key}`).innerHTML = `${scores[key]}<small>/7</small>`;
+  document.getElementById(`bar-${key}`).style.width = `${(scores[key] / 7) * 100}%`;
+
+  totalChecked = Object.values(checks).filter(Boolean).length;
+  document.getElementById('progressFill').style.width = `${(totalChecked / TOTAL) * 100}%`;
+  document.getElementById('progressLabel').textContent = `${totalChecked} / ${TOTAL}`;
+
+  if (totalChecked >= TOTAL) showResult();
+  else document.getElementById('resultSection').classList.remove('visible');
+}
+
+function showResult() {
+  const topKey = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  const sec = DATA[topKey];
+  const rs = document.getElementById('resultSection');
+
+  // Header
+  document.getElementById('resultHeader').innerHTML = `
+    <div class="result-label">🎉 診断結果</div>
+    <div class="result-type-badge" style="background:${sec.light};color:${sec.color}">${sec.emoji} ${sec.label}</div>
+    <div class="result-type-name">${sec.typeName}</div>
+    <p class="result-tagline">「${sec.tagline}」</p>`;
+
+  // Scores
+  const maxScore = Math.max(...Object.values(scores));
+  const rows = Object.entries(DATA).map(([k, s]) => `
+    <div class="score-row">
+      <div class="score-name">${s.emoji} ${s.typeName.replace('タイプ','')}</div>
+      <div class="score-track">
+        <div class="score-fill" style="background:${s.color};width:${maxScore > 0 ? (scores[k]/maxScore)*100 : 0}%"></div>
+      </div>
+      <div class="score-num" style="color:${s.color}">${scores[k]}</div>
+    </div>`).join('');
+  document.getElementById('resultScores').innerHTML = `
+    <div class="result-scores-title">スコア内訳</div>${rows}`;
+
+  // Detail
+  const jobsHTML = sec.jobs.map(j => `<li>${j}</li>`).join('');
+  document.getElementById('resultDetail').innerHTML = `
+    <div class="result-detail-header" style="border-left: 4px solid ${sec.color}; padding-left: 20px;">
+      <h3>${sec.emoji} ${sec.typeName}</h3>
+      <p>${sec.tagline}</p>
+    </div>
+    <div class="result-detail-body">
+      <div class="detail-block">
+        <div class="detail-block-title">あなたの隠れた強み</div>
+        <p>${sec.strength}</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">おすすめのAI副業</div>
+        <ul class="jobs-list" style="color:${sec.color}">${jobsHTML}</ul>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">最初の一歩</div>
+        <div class="first-step" style="background:${sec.light}">
+          <div class="first-step-title" style="color:${sec.color}">👟 今日からできること</div>
+          <p>${sec.step}</p>
+        </div>
+      </div>
+    </div>`;
+
+  rs.classList.add('visible');
+  setTimeout(() => rs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function resetAll() {
+  Object.keys(checks).forEach(k => { checks[k] = false; });
+  Object.keys(scores).forEach(k => { scores[k] = 0; });
+  totalChecked = 0;
+  document.querySelectorAll('.check-item').forEach(el => el.classList.remove('checked'));
+  Object.keys(DATA).forEach(k => {
+    document.getElementById(`count-${k}`).innerHTML = `0<small>/7</small>`;
+    document.getElementById(`bar-${k}`).style.width = '0%';
+  });
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressLabel').textContent = '0 / 35';
+  document.getElementById('resultSection').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildSections();
+</script>
+</body>
+</html>
